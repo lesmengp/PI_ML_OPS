@@ -1,33 +1,29 @@
 from fastapi import FastAPI, Request
-from pydantic import BaseModel
-from typing import Optional   # El Tipo del atributo podria ser opcional
-
 from fastapi.responses import FileResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import JSONResponse
-
 import pandas as pd
+import numpy as np
 import re
-import webbrowser
-import textwrap
-
-import traceback
-import logging
-
+import ast
+from pydantic import BaseModel
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from fastapi.responses import JSONResponse
 import json
 
-app = FastAPI()
-#templates = Jinja2Templates(directory="templates")
 
-#df_movies = pd.read_csv('DataSets/movies_dataset_RI.csv', sep=';')
-#df_movies = pd.read_csv('DataSets/movies_dataset_RI.csv', sep=';', encoding='utf-8')
-#df = pd.read_csv('DataSets/movies_dataset_RI.csv', sep=';', encoding='latin-1') 
-
-df = pd.read_csv('../DataSetPI-Cleaning/df_merged-OK.csv', sep=';')
+### Carga de Datos
+df_Funcion_5 = pd.read_csv('DadatesClean/df_Funcion_5.csv')
+df_Funcion_6 = pd.read_csv('DadatesClean/df_Funcion_6.csv')
+df_movies = pd.read_csv('DadatesClean/df_movies.csv', sep=';')
 
 # http://127.0.0.1:8000
 
 ###  INICIANDO LAS PRUEBAS CON FASTAPI
+
+app = FastAPI()
+class Item(BaseModel):
+    cantidad1: float
+    revenue_total1: float
 
 
 ### FUNCION Nro. 1
@@ -35,7 +31,7 @@ df = pd.read_csv('../DataSetPI-Cleaning/df_merged-OK.csv', sep=';')
 def peliculas_idioma(idioma:str):
     '''Ingresas el idioma, retornando la cantidad de peliculas producidas en el mismo'''
     try:
-        mask = df[df['original_language'] == idioma]
+        mask = df_movies[df_movies['original_language'] == idioma]
         respuesta = int(mask['original_language'].count())
     except (ValueError, SyntaxError):
         pass 
@@ -47,11 +43,11 @@ def peliculas_idioma(idioma:str):
 def peliculas_duracion(pelicula:str):
     '''Ingresas la pelicula, retornando la duracion y el año'''
     try:
-        respuesta = df[df['title'] == pelicula]['runtime']
-        anio = int(df[df['title'] == pelicula]['release_year'])
+        duracion = df_movies[df_movies['title'] == pelicula]['runtime']
+        anio = int(df_movies[df_movies['title'] == pelicula]['Anio'])
     except (ValueError, SyntaxError):
         pass 
-    return {'pelicula':pelicula, 'duracion':respuesta, 'anio':anio}
+    return {'pelicula':pelicula, 'duracion':duracion, 'anio':anio}
 
 
 ### FUNCION Nro. 3
@@ -59,8 +55,8 @@ def peliculas_duracion(pelicula:str):
 def franquicia(franquicia:str):
     '''Se ingresa la franquicia, retornando la cantidad de peliculas, ganancia total y promedio'''
     try:
-        cantidad = int(df[df['collection'] == franquicia]['title'].count())
-        ganancia_total = float(df[df['collection'] == franquicia]['revenue'].sum())
+        cantidad = int(df_movies[df_movies['Franquicia'] == franquicia]['Franquicia'].count())
+        ganancia_total = float(df_movies[df_movies['Franquicia'] == franquicia]['revenue'].sum())
         if cantidad == 0:
             ganancia_promedio = 0
         else:
@@ -75,52 +71,87 @@ def franquicia(franquicia:str):
 def peliculas_pais(pais:str):
     '''Ingresas el pais, retornando la cantidad de peliculas producidas en el mismo'''
     try:
-        respuesta = int(df[df['countries'] == pais]['title'].count())
+        respuesta = int(df_movies[df_movies['Paises'] == pais]['id'].count())
     except (ValueError, SyntaxError):
         pass 
     return {'pais':pais, 'cantidad':respuesta}
 
 
+#productora = 'Touchstone Pictures'
 ### FUNCION Nro. 5
 @app.get('/productoras_exitosas/{productora}')
 def productoras_exitosas(productora:str):
     '''Ingresas la productora, entregandote el revenue total y la cantidad de peliculas que realizo '''
     try:
-        revenue_total = float(df[df['companies'] == productora]['revenue'].sum())
-        cantidad = int(df[df['companies'] == productora]['revenue'].count())
+        revenue_total = float(df_Funcion_5[df_Funcion_5['companies'].str.contains(productora)]['revenue'].sum())
+        cantidad = int(df_Funcion_5[df_Funcion_5['companies'].str.contains(productora)]['revenue'].count())
     except (ValueError, SyntaxError):
         pass 
     return {'productora':productora, 'revenue_total': revenue_total,'cantidad':cantidad}
-
 
 
 ### FUNCION Nro. 6
 @app.get('/get_director/{nombre_director}')
 def get_director(nombre_director:str):
     try:
-        # Buscar todas las filas que contienen el nombre del director en la columna "crew_name"
-        PeliculasPorDirector = df[df['crew_name'].str.contains(nombre_director)]
-
-        # Buscar todas las filas que contienen el trabajo de director en la columna "crew_job"
-        PeliculasPorCargo = PeliculasPorDirector[PeliculasPorDirector['crew_job'].str.contains('Director')]
-
-        # Seleccionar solo las columnas "title" y "release_year"
-        PeliculasConsultadas = PeliculasPorCargo.loc[:, ['title', 'release_year', 'return','budget', 'revenue']]
-
+        #Hacemos una lista de ocurrencia de Directores en un DF temporal
+        df_Director = df_Funcion_6[df_Funcion_6['Nombre'].str.contains(nombre_director)]
+        
+        # Peliculas del Director con sus respectivas variables       
+        Peliculas_del_Director = df_Director[['title', 'release_year', 'revenue', 'budget']]
+        
+        # Retorno del exito 
+        retorno_total_director = (Peliculas_del_Director['revenue'].sum() / Peliculas_del_Director['budget'].sum())
+        
         # Convertir el DataFrame en una lista de diccionarios
-        Lista_De_Dicc = PeliculasConsultadas.to_dict('records')
-      
+        Lista_De_Dicc = Peliculas_del_Director.to_dict('records')
+        
         # Convertir la lista de diccionarios a formato JSON
-        Lista_De_Dicc_a_json = json.dumps(Lista_De_Dicc)
+        # Lista_De_Dicc_a_json = json.dumps(Lista_De_Dicc)
         
     except (ValueError, SyntaxError):
         pass 
-    return Lista_De_Dicc
+    return {'director':nombre_director, 'retorno_total_director':retorno_total_director, 'peliculas':Lista_De_Dicc}
   
 
 # ML
 @app.get('/recomendacion/{titulo}')
 def recomendacion(titulo:str):
-    '''Ingresas un nombre de pelicula y te recomienda las similares en una lista'''
-    respuesta = "Muy Pronto"
-    return {'lista recomendada': respuesta}
+    '''Ingresas la productora, entregandote el revenue total y la cantidad de peliculas que realizo '''
+    try:
+        # Obtener el id de la película que le gustó al usuario
+        movie_id = df_movies.loc[df_movies['title'] == titulo, 'id'].iloc[0]
+        
+        # Obteneiendo las características de las siguientes variables predictoras del Dataset
+        genre_features = df_movies['Generos']
+        director_features = df_movies['Director']
+        protagonist_features = df_movies['Protagonista']
+        actor1_features = df_movies['Actor1']
+        actor2_features = df_movies['Actor2']
+        anio_features = df_movies['Anio'].fillna(0).astype(str)  # Convertir a cadena y llenar valores NaN con '0'
+        
+        # Concatenar todas las características
+        all_features = genre_features + ' ' + director_features + ' ' + protagonist_features + ' ' + actor1_features + ' ' + actor2_features + ' ' + revenue_features
+
+        # Crear un objeto CountVectorizer para convertir las características en vectores
+        vectorizer = CountVectorizer(analyzer='word', lowercase=True, token_pattern=r'\w+')
+
+        # Obtener la matriz de documentos término-frecuencia (DTM) a partir de las características
+        all_features_matrix = vectorizer.fit_transform(all_features)
+
+        # Obtener las características de la película que le gustó al usuario
+        movie_features = df_movies.loc[df_movies['id'] == movie_id, 'Generos'].iloc[0] + ' ' + df_sr.loc[df_sr['id'] == movie_id, 'Director'].iloc[0] + ' ' + df_sr.loc[df_sr['id'] == movie_id, 'Protagonista'].iloc[0] + ' ' + df_sr.loc[df_sr['id'] == movie_id, 'Actor1'].iloc[0] + ' ' + df_sr.loc[df_sr['id'] == movie_id, 'Actor2'].iloc[0] + ' ' + anio_features.iloc[0]
+        movie_features_matrix = vectorizer.transform([movie_features])
+
+        # Calcular la similitud del coseno entre la película que le gustó al usuario y todas las demás películas
+        similarities = cosine_similarity(movie_features_matrix, all_features_matrix)
+
+        # Obtener los índices de las películas más similares
+        similar_indices = similarities.argsort()[0][-6:-1]
+
+        # Obtener los títulos de las películas más similares
+        similar_movies = df_movies.loc[similar_indices, 'title'] 
+        
+    except (ValueError, SyntaxError):
+        pass 
+    return {'lista recomendada': similar_movies}
