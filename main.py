@@ -4,11 +4,9 @@ import pandas as pd
 import numpy as np
 import re
 import ast
-from pydantic import BaseModel
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from fastapi.responses import JSONResponse
-import json
 
 
 ### Carga de Datos
@@ -16,9 +14,10 @@ df_Funcion_5 = pd.read_csv('DadatesClean/df_Funcion_5.csv')
 df_Funcion_6 = pd.read_csv('DadatesClean/df_Funcion_6.csv')
 df_movies = pd.read_csv('DadatesClean/df_movies.csv', sep=';')
 
-# http://127.0.0.1:8000
+##   https://pi-ml-ops-srp.onrender.com
 
 ###  INICIANDO LAS PRUEBAS CON FASTAPI
+
 
 app = FastAPI()
 class Item(BaseModel):
