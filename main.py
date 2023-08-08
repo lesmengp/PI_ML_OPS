@@ -20,9 +20,6 @@ df_movies = pd.read_csv('DadatesClean/df_movies.csv', sep=';')
 
 
 app = FastAPI()
-class Item(BaseModel):
-    cantidad1: float
-    revenue_total1: float
 
 
 ### FUNCION Nro. 1
