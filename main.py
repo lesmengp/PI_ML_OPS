@@ -34,7 +34,7 @@ def peliculas_idioma(idioma:str):
         mask = df_movies[df_movies['original_language'].str.lower() == idioma]
         
         if mask.empty:
-            {'Error': 'Idioma no encontrada. Intente de nuevo...!!! '}    # Si la mascara esta vacía, entonces no encontro ningun idioma.
+            {'Error': 'Idioma no encontrado. Intente de nuevo...!!! '}    # Si la mascara esta vacía, entonces no encontro ningun idioma.
         
         respuesta = mask.shape[0]   # Si la mascara no esta vacís, entonces registra la cantidad de registros o filas = Total de Películas.         
 
@@ -99,7 +99,7 @@ def peliculas_pais(pais:str):
         datos_pais = df_movies[df_movies['Paises'].str.lower() == pais]
         
         if datos_pais.empty:
-            return {'error': 'País no encontrada en el DataFrame.'}
+            return {'error': 'País no encontrado en el DataFrame.'}
         
         cantidad = int(datos_pais['Paises'].shape[0]) 
         
@@ -119,7 +119,7 @@ def productoras_exitosas(productora:str):
         datos_productora = df_movies[df_movies['Productores'].str.lower().str.contains(productora)]
         
         if datos_productora.empty:
-            return {'error': 'País no encontrada en el DataFrame.'}
+            return {'error': 'Productota no encontrada en el DataFrame.'}
                   
         revenue_total = float(datos_productora['revenue'].sum())
         cantidad = int(datos_productora['revenue'].shape[0])
@@ -140,7 +140,7 @@ def get_director(nombre_director:str):
         datos_director = df_movies[df_movies['Director'].str.lower().str.contains(nombre_director)]    # #Hacemos una lista de ocurrencia de Directores en un DF temporal
       
         if datos_director.empty:
-            return {'error': 'País no encontrada en el DataFrame.'}
+            return {'error': 'Director no encontrado en el DataFrame.'}
         
         # Peliculas del Director con sus respectivas variables       
         Peliculas_del_Director = datos_director[['title', 'Anio', 'revenue', 'budget']]
