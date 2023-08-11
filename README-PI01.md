@@ -3,7 +3,7 @@
 # <h1 align=center>**`Machine Learning (MLOps)`**</h1>
 
 <h1 align="center">
-  <span style="font-size: 30px;">@autor: Lesmen Gerardo García Pernia</span> <br>
+  <span style="font-size: 25px;">@autor: Lesmen Gerardo García Pernia</span> <br>
   <a href="https://github.com/lesmengp/PI_ML_OPS.git">GitHub: <span style="font-size: 20px;">https://github.com/lesmengp/PI_ML_OPS.git</span></a> <br>
   <a href="https://drive.google.com/drive/folders/1c1wGdo7MV3T0YunNszSdCpvz-mNldwBw?usp=drive_link">Drive: <span style="font-size: 20px;">https://drive.google.com/drive/folders/1c1wGdo7MV3T0YunNszSdCpvz-mNldwBw?usp=drive_link</span></a> <br>
   <a href="https://pi-ml-ops-srp.onrender.com">Render: <span style="font-size: 20px;">https://pi-ml-ops-srp.onrender.com</span></a>
