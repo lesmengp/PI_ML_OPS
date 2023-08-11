@@ -23,7 +23,7 @@
 ## Objetivos:
 ### *Crear un Modelo de Sistema de Recomendacion utilizando las caracteristicas de las películas para encontrar peliculas similares a las que ha visto un determinado usuario y le han gustado.*
 
-### En el presente proyecto se estará utilizando un modelo de Recomendacion Basado en el Analisis de Contenido. El objetivo de este tipo de modelo es analizar y seleccionar desde una gran Base de Datos, productos que sean similares a las caracteristicas de preferencia de un usuario. *"Seleccionar productos similares a aquellos que te gustan"*<Br><Br> Adicionalmente, estaremos utilizando como medida para cuantificar la similitud entre las películas, *`la Similitud del Coseno`*.<Br><Br> La Similitud del Coseno mide el coseno del ángulo entre dos vectores en un espacio vectorial y mientras más pequeño sea el ángulo entre los vectores, más similares se consideran. <Br><Br> La fórmula para calcular la similitud del coseno entre dos vectores A y B se define de la siguiente manera:La fórmula de la similitud del coseno es:
+### En el presente proyecto estará utilizando un modelo de Recomendacion Basado en el Analisis de Contenido. El objetivo de este tipo de modelo es analizar y seleccionar desde una gran Base de Datos, productos que sean similares a las caracteristicas de preferencia de un usuario. *"Seleccionar productos similares a aquellos que te gustan"*<Br><Br> Adicionalmente, estaremos utilizando como medida para cuantificar la similitud entre las películas, *`la Similitud del Coseno`*.<Br><Br> La Similitud del Coseno mide el coseno del ángulo entre dos vectores en un espacio vectorial y mientras más pequeño sea el ángulo entre los vectores, más similares se consideran. <Br><Br> La fórmula para calcular la similitud del coseno entre dos vectores A y B se define de la siguiente manera:La fórmula de la similitud del coseno es:
 
 $$ \frac{A \cdot B}{\|A\| \cdot \|B\|} $$
 
@@ -56,6 +56,14 @@ matplotlib==3.7.1<Br>
 seaborn=0.12.2<Br>
 numpy=1.24.3<Br>
 
+
+Puntos a Desarrollar:
+1) Extracción Transformación y Carga (ETL)
+2) Analisis Exploratorios de los Datos (EDA)
+3) Guardando el DataSets resultante para luego subirlo a GitHub.
+4) Funciones APis
+
+
 # 1) Extracción Transformación y Carga (ETL)
 ## **Fuente de datos:**
 
@@ -70,7 +78,14 @@ Diccionario de Datos del Proyecto
 
 
 ### 1.1) Revision inicial de los datos de "df_movies"
+Total de Registros del DataSets de df_movies =  45466<Br>
+Total de Columnas del DataSets de df_movies =  24<Br>
+
+Total de Registros del DataSets de df_credits =  45476<Br>
+Total de Columnas del DataSets de df_credits =  3<Br>
+
 Total de valores nulos en 'df_movies'=  105562
+
 ### 1.1.1) Requerimientos Iniciales del Proyecto:
 ### 1.1.1.1) Requerimiento del Proyecto, Nro.: 1
 + Algunos campos, como **`belongs_to_collection`**, **`production_companies`** y otros (ver diccionario de datos) están anidados, esto es o bien tienen un diccionario o una lista como valores en cada fila, ¡deberán desanidarlos para poder  y unirlos al dataset de nuevo hacer alguna de las consultas de la API! O bien buscar la manera de acceder a esos datos sin desanidarlos.
@@ -158,6 +173,7 @@ Total de Registros Duplicados en: 'df_movies' =  30<Br>
 Total de Registros Duplicados en: 'df_credits' =  44<Br>
 
 # 2) Analisis Exploratorios de los Datos (EDA)
+
 ## 2.1) Preprocesamiento de Datos:
 ### 2.1.1) Valores Faltantes
 En resumen, el total de valores faltantes es el siguiente:<Br>
@@ -258,6 +274,7 @@ En el código de cada función se realizó la documentacón respectiva del funci
 Los requerimientos de las funciones a desarrollar son los siguiente:
 
 ### 4.1) Funciones Requeridas
+
 + def **peliculas_idioma( *`Idioma`: str* )**:
     Se ingresa un idioma (como están escritos en el dataset, no hay que traducirlos!). Debe devolver la cantidad de películas producidas en ese idioma.
 
