@@ -154,19 +154,23 @@ def get_director(nombre_director:str):
         return {'director':nombre_director, 'retorno_total_director':retorno_total_director, 'peliculas':Lista_De_Dicc}
         
     except Exception as e:
-        return {'Error': f'Por favor, corrija este error: {e}'}
-  
+        return {'Error': f'Por favor, corrija este error: {e}'}  
 
-# ML
+# ML ORG
 @app.get('/recomendacion/{titulo}')
 def recomendacion(titulo:str):
     '''Ingresas un nombre de pelicula y te recomienda las similares en una lista'''
     try:
         # Convertir el título ingresado por el usuario a minúsculas
         titulo = titulo.lower()
-        # Obtener el id de la película que le gustó al usuario
+        
+        # Buscar el título en minúsculas en el DataFrame
+        datos_titulo = df_movies.loc[df_movies['title'].str.lower() == titulo]
+        
+        if datos_titulo.empty:   # Si no exite la pelicula envia mensaje de error
+            return {'error': 'Película no encontrada en el DataFrame.'}
+            
         movie_id = df_movies.loc[df_movies['title'].str.lower()  == titulo, 'id'].iloc[0]
-
         # Obteneiendo las características de las siguientes variables predictoras del Dataset
         genre_features = df_movies['Generos']
         director_features = df_movies['Director']
@@ -175,13 +179,11 @@ def recomendacion(titulo:str):
         actor2_features = df_movies['Actor2']
         popularity_features = df_movies['popularity'].fillna(0).astype(str)  # Convertir a cadena y llenar valores NaN con '0'
         anio_features = df_movies['Anio'].fillna(0).astype(str)  # Convertir a cadena y llenar valores NaN con '0'
-        revenue_features = df_movies['revenue'].fillna(0).astype(str)  # Convertir a cadena y llenar valores NaN con '0'
         vote_average_features = df_movies['vote_average'].fillna(0).astype(str)  # Convertir a cadena y llenar valores NaN con '0'
-        vote_count_features = df_movies['vote_count'].fillna(0).astype(str)  # Convertir a cadena y llenar valores NaN con '0'
         franquicia_features = df_movies['Franquicia']
         
         # Concatenar todas las características
-        all_features = franquicia_features + ' ' + genre_features + ' ' + director_features + ' ' + protagonist_features + ' ' + actor1_features + ' ' + actor2_features + ' ' + popularity_features + ' ' + anio_features + ' ' + revenue_features + ' ' + vote_average_features + ' ' + vote_count_features
+        all_features = franquicia_features + ' ' + genre_features + ' ' + director_features + ' ' + protagonist_features + ' ' + actor1_features + ' ' + actor2_features + ' ' + popularity_features + ' ' + anio_features  + ' ' + vote_average_features
 
         # Crear un objeto CountVectorizer para convertir las características en vectores
         vectorizer = CountVectorizer(analyzer='word', lowercase=True, token_pattern=r'\w+')
@@ -190,7 +192,7 @@ def recomendacion(titulo:str):
         all_features_matrix = vectorizer.fit_transform(all_features)
 
         # Obtener las características de la película que le gustó al usuario
-        movie_features = df_movies.loc[df_movies['id'] == movie_id, 'Franquicia'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Generos'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Director'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Protagonista'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Actor1'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Actor2'].iloc[0] + ' ' + popularity_features.iloc[0] + ' ' + anio_features.iloc[0] + ' ' + revenue_features.iloc[0] + ' ' + vote_average_features.iloc[0] + ' ' + vote_count_features.iloc[0]
+        movie_features = df_movies.loc[df_movies['id'] == movie_id, 'Franquicia'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Generos'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Director'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Protagonista'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Actor1'].iloc[0] + ' ' + df_movies.loc[df_movies['id'] == movie_id, 'Actor2'].iloc[0] + ' ' + popularity_features.iloc[0] + ' ' + anio_features.iloc[0] + ' ' + vote_average_features.iloc[0]
         movie_features_matrix = vectorizer.transform([movie_features])
 
         # Calcular la similitud del coseno entre la película que le gustó al usuario y todas las demás películas
@@ -203,11 +205,12 @@ def recomendacion(titulo:str):
         recomendacion = df_movies.loc[similar_indices, 'title']
         
         recomendacion = recomendacion.tolist()
-
+        
         return {'Películas Recomendadas': recomendacion}
-    
+        
     except IndexError:
         return {'Error': 'Película no encontrada. Intente de nuevo...!!! '}
     
     except Exception as e:
         return {'error': f'Ocurrió un error: {e}'}
+
