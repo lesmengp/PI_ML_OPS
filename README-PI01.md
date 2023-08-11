@@ -172,7 +172,7 @@ En el 70.992 % de los casos, el Idioma predominante es Ingles ('en').<Br>
 Por lo tanto se decide imputar los 11 valores nulos con el idioma que tiene la mayor frecuencia = 'en'.
 
 2) Columna = 'overview'<Br>
-La información de la columna 'overview' es relevante ya que nos ofrece una caracteristica general de la película. No tener este atributo impacta en la recomendación de la película, en el caso de utilizar esta columna para la dicha recomendación. En resumen, en este momento no es oprtuno eliminar estos valores NaN. 
+La información de la columna 'overview' es relevante ya que nos ofrece una caracteristica general de la película. No tener este atributo impacta en la recomendación de la película, en el caso de utilizar esta columna para la dicha recomendación. En resumen, en este momento no es oprtuno eliminar estos valores NaN. Total de valores nulos 941.  (2.075 %)  
 
 3) Columna = 'runtime'<Br>
 En este caso, se procede a imputar con el valor del Cuartil Q3 (107); ya que indica que el 75 % de la duración de la película dura aproximadamente 107 minutos o menos.<Br> En resumen, se procede a sustituir los 246 valores nulos de la columna 'runtime' por 107 (Tiempo en minutos) ya que la diferencia entre el Q3 y la media (13), es mucho menor que la desviación estandar; qué es la que nos indica la dispersión de los datos.<Br> Estos 246 valores quedarian a menos de una desviación estandar de la media.
@@ -190,7 +190,15 @@ Se puede observar que la Columna 'Franquicia' tiene el 90.109 % de valores falta
 
 En las graficas de Cajas o Bogites se puede observar que practicamente todas las variables presentan datos atipicos. Las variables con menos datos atípicos son el voto promedio y la popularidad de las películas.
 
+<p align="center">
+<img src="src/GraficaDispersion.png"  height=300>
+</p>
+
 Adicionalmente, se realizó una correlación entre las variables númericas y solo se encontro una correlación significativa del 0,81, entre las variables 'vote_count' y 'revenue'.
+
+<p align="center">
+<img src="src/Correlaciones.png"  height=300>
+</p>
 
 Preguntas a tomar en consideración:
 
